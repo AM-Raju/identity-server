@@ -111,7 +111,10 @@ async function run() {
     /* ======= category Block ========== */
 
     app.get("/categories", async (req, res) => {
-      const result = await categoriesCollection.find().toArray();
+      const result = await categoriesCollection
+        .find()
+        .sort({ name: -1 })
+        .toArray();
       res.send(result);
     });
 
@@ -177,11 +180,24 @@ async function run() {
     /* ======= Order Block ========== */
     app.post("/create-order", async (req, res) => {
       const order = req.body;
-      console.log("Order", order);
       const result = await ordersCollection.insertOne(order);
       res.send(result);
     });
 
+    app.get("/orders", async (req, res) => {
+      const result = await ordersCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/orders/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { orderedBy: email };
+      let result;
+      if (email) {
+        result = await ordersCollection.find(query).toArray();
+      }
+      res.send(result);
+    });
     /* ======= Review Block ========== */
 
     // Start the server
